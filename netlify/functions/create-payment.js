@@ -1,40 +1,63 @@
-exports.handler = async (event) => {
-  const { nomProduit, prixProduit } = JSON.parse(event.body);
+export const handler = async (event) => {
+
+  const { nomProduit, prixProduit } =
+    JSON.parse(event.body || "{}");
 
   try {
-    const response = await fetch("https://app.paydunya.com/api/v1/checkout-invoice/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "PAYDUNYA-MASTER-KEY": process.env.PAYDUNYA_MASTER_KEY,
-        "PAYDUNYA-PUBLIC-KEY": process.env.PAYDUNYA_PUBLIC_KEY,
-        "PAYDUNYA-TOKEN": process.env.PAYDUNYA_TOKEN
-      },
-      body: JSON.stringify({
-        invoice: {
-          total_amount: prixProduit,
-          description: nomProduit
-        }
-      })
-    });
+
+    const response = await fetch(
+      "https://api.moneroo.io/v1/payments/initiate",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json",
+
+          Authorization:
+            `Bearer ${process.env.MONEROO_SECRET_KEY}`
+        },
+
+        body: JSON.stringify({
+
+          amount: Number(prixProduit),
+
+          currency: "XOF",
+
+          description: nomProduit,
+
+          return_url:
+            "https://pgd-biblio.netlify.app/success",
+
+          callback_url:
+            "https://pgd-biblio.netlify.app/.netlify/functions/webhook",
+
+          customer: {
+            name: "Client"
+          }
+
+        })
+      }
+    );
 
     const data = await response.json();
 
-    console.log("PAYDUNYA RESPONSE:", data);
+    console.log("MONEROO RESPONSE:", data);
 
     return {
       statusCode: 200,
+
       body: JSON.stringify(data)
     };
 
   } catch (error) {
+
     console.log("ERROR:", error);
 
     return {
       statusCode: 500,
+
       body: JSON.stringify({
-        error: "Erreur création paiement",
-        details: error.message
+        error: error.message
       })
     };
   }

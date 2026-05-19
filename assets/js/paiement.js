@@ -2,9 +2,13 @@ const boutons = document.querySelectorAll(".payerBtn");
 
 boutons.forEach((bouton) => {
   bouton.addEventListener("click", async () => {
-
-    const nomProduit = bouton.dataset.nom;
+    const nomProduit = bouton.dataset.nom || "";
     const prixProduit = Number(bouton.dataset.prix);
+
+    if (!nomProduit || Number.isNaN(prixProduit)) {
+      alert("Produit ou prix invalide");
+      return;
+    }
 
     try {
       const response = await fetch("/.netlify/functions/create-payment", {
@@ -37,11 +41,9 @@ boutons.forEach((bouton) => {
       } else {
         alert("Lien de paiement introuvable");
       }
-
     } catch (error) {
       console.error(error);
       alert("Erreur connexion serveur");
     }
-
   });
 });
