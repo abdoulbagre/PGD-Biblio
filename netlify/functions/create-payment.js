@@ -1,52 +1,36 @@
+const axios = require("axios");
+
 exports.handler = async (event) => {
-
-  const { nomProduit, prixProduit } = JSON.parse(event.body || "{}");
-
-  if (!nomProduit || !prixProduit) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: "Données manquantes" })
-    };
-  }
+  const { nomProduit, prixProduit } = JSON.parse(event.body);
 
   try {
-
-    const response = await fetch(
-      "https://api.moneroo.io/checkout",
+    const response = await axios.post(
+      "https://app.paydunya.com/api/v1/checkout-invoice/create",
       {
-        method: "POST",
+        invoice: {
+          total_amount: prixProduit,
+          description: nomProduit
+        }
+      },
+      {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${process.env.MONEROO_API_KEY}`
-        },
-
-        body: JSON.stringify({
-          amount: parseInt(prixProduit, 10),
-          currency: "XOF",
-          description: nomProduit,
-
-          return_url: "https://pgd-market.netlify.app/succes.html",
-          cancel_url: "https://pgd-market.netlify.app/annule.html",
-        })
+          "PAYDUNYA-MASTER-KEY": process.env.PAYDUNYA_MASTER_KEY,
+          "PAYDUNYA-PUBLIC-KEY": process.env.PAYDUNYA_PUBLIC_KEY,
+          "PAYDUNYA-TOKEN": process.env.PAYDUNYA_TOKEN
+        }
       }
     );
 
-    const data = await response.json();
-
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        checkout_url: data.checkout_url
-      })
+      body: JSON.stringify(response.data)
     };
 
   } catch (error) {
-
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: error.message
-      })
+      body: JSON.stringify(error.response?.data || error.message)
     };
   }
 };
