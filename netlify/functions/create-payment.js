@@ -1,17 +1,42 @@
 export const handler = async (event) => {
 
-  const { nomProduit, prixProduit } =
-    JSON.parse(event.body || "{}");
-
   try {
 
+    // Vérifie que la requête est POST
+    if (event.httpMethod !== "POST") {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({
+          error: "Méthode non autorisée"
+        })
+      };
+    }
+
+    // Parse sécurisé
+    const body = JSON.parse(event.body || "{}");
+
+    const nomProduit = body.nomProduit;
+    const prixProduit = Number(body.prixProduit);
+
+    // Validation
+    if (!nomProduit || !prixProduit) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: "Produit ou prix manquant"
+        })
+      };
+    }
+
+    // Requête Moneroo
     const response = await fetch(
-      "https://api.moneroo.io/v1/payments/initiate",
+      "https://api.moneroo.io/v1/payments/initialize",
       {
         method: "POST",
 
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
 
           Authorization:
             `Bearer ${process.env.MONEROO_SECRET_KEY}`
@@ -19,39 +44,82 @@ export const handler = async (event) => {
 
         body: JSON.stringify({
 
-          amount: Number(prixProduit),
+          amount: prixProduit,
 
           currency: "XOF",
 
           description: nomProduit,
 
           return_url:
-            "https://pgd-biblio.netlify.app/success",
+            "https://pgd-biblio.netlify.app/success.html",
 
           callback_url:
             "https://pgd-biblio.netlify.app/.netlify/functions/webhook",
 
           customer: {
-            name: "Client"
+            first_name: "Client",
+            last_name: "PGD",
+            email: "client@example.com"
+          },
+
+          metadata: {
+            produit: nomProduit
           }
 
         })
       }
     );
 
+    // Réponse API
     const data = await response.json();
 
     console.log("MONEROO RESPONSE:", data);
 
+    // Vérifie si Moneroo retourne une erreur
+    if (!response.ok) {
+
+      return {
+        statusCode: response.status,
+
+        body: JSON.stringify({
+          error: data.message || "Erreur Moneroo",
+          details: data
+        })
+      };
+    }
+
+    // Vérifie checkout_url
+    const checkoutUrl = data?.data?.checkout_url;
+
+    if (!checkoutUrl) {
+
+      return {
+        statusCode: 500,
+
+        body: JSON.stringify({
+          error: "Lien de paiement introuvable",
+          details: data
+        })
+      };
+    }
+
+    // Succès
     return {
       statusCode: 200,
 
-      body: JSON.stringify(data)
+      body: JSON.stringify({
+
+        success: true,
+
+        paymentId: data.data.id,
+
+        checkout_url: checkoutUrl
+      })
     };
 
   } catch (error) {
 
-    console.log("ERROR:", error);
+    console.error("SERVER ERROR:", error);
 
     return {
       statusCode: 500,
