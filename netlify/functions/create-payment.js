@@ -51,10 +51,13 @@ export const handler = async (event) => {
           description: nomProduit,
 
           return_url:
-            "https://pgd-biblio.netlify.app/success.html",
+            "https://pgd-market.netlify.app/success.html",
+          
+          cancel_url:
+            "https://pgd-market.netlify.app/annule.html",
 
           callback_url:
-            "https://pgd-biblio.netlify.app/.netlify/functions/webhook",
+            "https://pgd-market.netlify.app/.netlify/functions/webhook",
 
           customer: {
             first_name: "Client",

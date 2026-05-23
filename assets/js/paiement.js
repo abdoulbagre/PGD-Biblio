@@ -1,4 +1,4 @@
-const boutons = document.querySelectorAll(".payerBtn");
+const boutons = document.querySelectorAll("#payerBtn");
 
 boutons.forEach((bouton) => {
 
@@ -6,6 +6,8 @@ boutons.forEach((bouton) => {
 
     const nomProduit = bouton.dataset.nom?.trim();
     const prixProduit = Number(bouton.dataset.prix);
+    const nom = document.getElementById("nom").value;
+    const email = document.getElementById("email").value;
 
     // Validation
     if (!nomProduit || Number.isNaN(prixProduit) || prixProduit <= 0) {
@@ -34,6 +36,8 @@ boutons.forEach((bouton) => {
           },
 
           body: JSON.stringify({
+            nom,
+            email,
             nomProduit,
             prixProduit
           })

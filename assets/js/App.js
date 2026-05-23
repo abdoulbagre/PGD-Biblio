@@ -10,8 +10,11 @@ c.innerHTML+=
       </a>  
       
       <h3>${p.nom}</h3>
-      <p id="descriptionProduit">${p.description}</p>
-      <a class="btn-commande" href="Commande.html?id=${p.id}">voir les détails</a>
+      <p class="prixProduit">
+        <span class="old-price">${p.oldprix} F CFA</span>
+        <span class="new-price">${p.prix} F CFA</span>
+      </p>
+      <a class="btn-commande" href="Detail_produit.html?id=${p.id}">voir les détails</a>
   </div>`})
 }
 

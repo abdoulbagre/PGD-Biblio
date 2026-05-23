@@ -1,23 +1,56 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Détail produit</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="assets/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <title>Commande</title>
+
 </head>
 <body>
-<section class="detail-produit">
-    <img id="image-Produit">
-    <div class="info-Produit">
-        <h2 id="titreProduit"></h2>
-        <p id="descriptionProduit"></p>
-        <p id="prixProduit"></p>
-        <button class="payerBtn">Acheter maintenant</button>
+
+  <div class="checkout">
+
+    <!-- FORMULAIRE -->
+    <div class="form-box">
+
+      <h2>Informations client</h2>
+
+      <div class="input-group">
+        <label>Nom complet</label>
+        <input type="text" id="nom" required >
+      </div>
+
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" id="email" required >
+      </div>
+
     </div>
-</section>
-<script src="assets/js/Data.js"></script>
-<script src="assets/js/Select.js"></script>
-<script src="assets/js/paiement.js"></script>
+
+    <!-- RÉSUMÉ -->
+    <div class="summary-box">
+
+      <h2>Votre commande</h2>
+
+    <section class="detail-produit">
+      <img class="image-Produit">
+      <div class="info-Produit">
+          <h2 class="titreProduit"></h2>
+          <p class="descriptionProduit" style="display: none;"></p>
+          <div class="price-contain">
+            Net à Payer: <h3 class="prixProduit"></h3>
+          </div>
+          <button id="payerBtn">Payer</button>
+      </div>
+    </section>
+
+    </div>
+
+  </div>
+<script defer src="assets/js/Data.js"></script>
+<script defer src="assets/js/Select.js"></script>
+<script defer src="assets/js/paiement.js"></script>
+
 </body>
 </html>
